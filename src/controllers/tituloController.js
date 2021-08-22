@@ -15,16 +15,85 @@ const createTitle = async (req, res) => {
     estudio: req.body.estudio,
     criadoEm: req.body.criadoEm
   })
-  //TODO : criar validação se filme já existe
-  try {
-    const novoTitulo = await titulo.save()
-    res.status(201).json(novoTitulo)
-  } catch (err) {
-    res.status(400).json({ message: err.message})
-  }
+  const tituloExistente = await Titulo.findOne({nome: req.body.nome})
+    if(tituloExistente){
+        return res.status(409).json({error: 'Titulo já cadastrado'})
+    }
+    try{
+        const novoTitulo = await titulo.save()
+        res.status(201).json(novoTitulo)
+    }catch (err){
+        res.status(400).json({message: err.message})
+    }
 }
 
+
+const getPixar = async (req,res) => {
+    const pegarPixar = await Titulo.find().populate('estudio')
+    const filtrarPixar = pegarPixar.filter(titulos => titulos.estudio.nome == "Pixar")
+    res.status(200).json(filtrarPixar)
+}
+
+
+const getWallDisney = async (req, res) => {
+    const pegarDisney = await Titulo.find().populate('estudio')
+    const filtrarDisney = pegarDisney.filter(titulo => titulo.estudio.nome == 'Wall Disney')
+    res.status(200).json(filtrarDisney)
+}
+
+
+const getWarner = async (req, res) => {
+    const pegarWarner = await Titulo.find().populate('estudio')
+    const filtrarWarner = pegarWarner.filter(titulo => titulo.estudio.nome == 'Warner Bros')
+    res.status(200).json(filtrarWarner)
+}
+
+
+const updateTitulo = async (req, res) => {
+
+    try{
+        const titulo = await Titulo.findById(req.params.id)
+        if(titulo == null){
+            return res.status(404).json({message: "titulo não encontrado"})
+        }
+
+        if(req.body.nome != null){
+            titulo.nome = req.body.nome
+        }
+    
+
+        const tituloAtualizado = await titulo.save()
+        return res.status(200).json(tituloAtualizado)
+
+    } catch (err){
+        res.status(500).json({message: err.message})
+    }
+}
+
+
+const deleteTitulo = async (req, res) => {
+    try{
+        const titulo = await Titulo.findById(req.params.id)
+        if(titulo == null){
+            return res.status(404).json({message: "Id não encontrado"})
+        }
+
+        titulo.remove()
+        res.status(200).json({"message": "Titulo removido"})
+
+    } catch (err){
+        res.status(500).json({message: err.message})
+    }
+}
+
+
+
 module.exports = {
-  getAll,
-  createTitle
+    getAll,
+    createTitle,
+    getPixar,
+    getWallDisney,
+    getWarner,
+    updateTitulo,
+    deleteTitulo
 }

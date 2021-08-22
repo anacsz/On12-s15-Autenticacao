@@ -8,10 +8,14 @@ router.get('/', controller.getAll)
 //criar um novo titulo/post/save
 router.post('/', controller.createTitle)
 
-//listar um titulo/get/findById
+router.get('/pixar', controller.getPixar)
 
-//atualizar uma informacao especifica num titulo/patch/findById/save
+router.get('/walldisney', controller.getWallDisney)
 
-//deletar um titulo/delete/findById/remove
+router.get('/warnerbros', controller.getWarner)
+
+router.patch('/:id', controller.updateTitulo)
+
+router.delete('/:id', controller.deleteTitulo)
 
 module.exports = router
